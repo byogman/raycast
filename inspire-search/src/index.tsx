@@ -51,57 +51,7 @@ export default function Command() {
             </ActionPanel>
           }
         />
-      )).concat(
-        // add empty items to maintain the list length
-        Array.from({ length: 9 - data.hits.hits.length }, (_, index) => (
-          <List.Item key={`empty-${index}`} title="" />
-        ))
-      )}
+      ))}
     </List>
   );
 };
-
-
-
-
-
-
-// auxiliary functions
-
-// download BibTeX code
-
-// defines actions
-
-// function Actions(props: { item: Parser.Item }) {
-//   return (
-//     <ActionPanel title={props.item.title}>
-//    	< ActionPanel.Section>
-//         {props.item.link && (
-//           <Action
-//             title="Next Page"
-//             shortcut={{ modifiers: ["cmd"], key: "arrowRight" }}
-//             onAction={() => console.log("Go right")}
-//           />
-//         )}
-//       <ActionPanel.Section>
-//         {props.item.link && <Action.OpenInBrowser url={props.item.link} />}
-//         {props.item.guid && <Action.OpenInBrowser url={props.item.guid} title="Open Comments in Browser" />}
-//       </ActionPanel.Section>
-//       // <ActionPanel.Section>
-// //         {props.item.link && (
-//           	<Action.CopyToClipboard
-//             	content={links.bibtex}
-//             	 title="Copy BibTeX"
-//             shortcut={{ modifiers: ["cmd"], key: "c" }}
-//         	 />
-//		 <ActionPanel.Section>
-//         {props.item.link && (
-//           <Action.CopyToClipboard
-//             content={links.bibtex}
-//             title="Show Citations"
-//             shortcut={{ modifiers: ["cmd"], key: "s" }}
-//           />
-//         )}
-//    </ActionPanel>
-//   );
-// }
