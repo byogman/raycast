@@ -1,6 +1,7 @@
 import { ActionPanel, List, Action } from "@raycast/api";
 import { useState, useEffect } from "react";
 import { useFetch } from "@raycast/utils";
+import { abbreviateNames } from "./utils";
 
 export default function Command() {
   const [searchText, setSearchText] = useState("");
@@ -26,7 +27,7 @@ export default function Command() {
         <List.Item 
           key={item.id} 
           title={`${index + 1 + indexOffset}. ${item.metadata.titles[0].title}`} 
-          subtitle={item.metadata.authors.map(obj => obj.full_name).join(', ')}
+          subtitle={abbreviateNames(item.metadata.authors)}
           accessories={[{text: `${item.metadata.citation_count}`},  {text:`(${item.created.slice(0,4)})`}]}
           actions={
             <ActionPanel title="Inspire HEP Search">
