@@ -14,14 +14,6 @@
       "name": "index",
       "title": "Search Inspire HEP",
       "description": "Searches papers on inspirehep.net",
-      "arguments": [
-        {
-          "name": "query",
-          "placeholder": "Query",
-          "type": "text",
-          "required": true
-        }
-      ],
       "mode": "view"
     }
   ],

@@ -22,8 +22,8 @@ export default function Command() {
   }, [pageNumber]);
 
   return (
-    <List isLoading={isLoading} onSearchTextChange={setSearchText} throttle>
-      {(data && data.hits && Array.isArray(data.hits.hits) ? data.hits.hits : []).map((item, index) => (
+    <List isLoading={isLoading} searchBarPlaceholder={`Search InspireHEP...`} onSearchTextChange={setSearchText} throttle>
+     {(searchText && data && data.hits && Array.isArray(data.hits.hits) ? data.hits.hits : []).map((item, index) => (
         <List.Item 
           key={item.id} 
           title={`${index + 1 + indexOffset}. ${item.metadata.titles[0].title}`} 
