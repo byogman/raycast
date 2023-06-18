@@ -3,11 +3,13 @@ import { useState, useEffect } from "react";
 import { useFetch } from "@raycast/utils";
 import { abbreviateNames } from "./utils";
 
+const API_PATH = 'https://inspirehep.net/api/literature?fields=titles,authors.full_name,citation_count&size=9';
+
 export default function Command() {
   const [searchText, setSearchText] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
   const [indexOffset, setIndexOffset] = useState(0);
-  const { isLoading, data } = useFetch(`https://inspirehep.net/api/literature?fields=titles,authors.full_name,citation_count&sort=mostrecent&size=9&page=${pageNumber}&q=${searchText}`, {
+  const { isLoading, data } = useFetch(`${API_PATH}&sort=mostrecent&page=${pageNumber}&q=${searchText}`, {
     // to make sure the screen isn't flickering when the searchText changes
     keepPreviousData: true,
   }, [pageNumber]);
