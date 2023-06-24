@@ -12,7 +12,7 @@ export default function Command() {
   const { isLoading, data } = useFetch(`${API_PATH}&sort=mostrecent&page=${pageNumber}&q=${searchText}`, {
     // to make sure the screen isn't flickering when the searchText changes
     keepPreviousData: true,
-  }, [pageNumber]);
+  });
 
   useEffect(() => {
     setPageNumber(1);
