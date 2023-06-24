@@ -1,4 +1,4 @@
-import { ActionPanel, List, Action } from "@raycast/api";
+import { Action, ActionPanel, Icon, List } from "@raycast/api";
 import { useState, useEffect } from "react";
 import { useFetch } from "@raycast/utils";
 import { abbreviateNames } from "./utils";
@@ -13,6 +13,11 @@ export default function Command() {
     // to make sure the screen isn't flickering when the searchText changes
     keepPreviousData: true,
   });
+  const showCitations = (item) => {
+    return () => {
+      setSearchText(`refersto%3Arecid%3A${item.id}`);
+    }
+  };
 
   useEffect(() => {
     setPageNumber(1);
@@ -24,35 +29,41 @@ export default function Command() {
   }, [pageNumber]);
 
   return (
-    <List isLoading={isLoading} searchBarPlaceholder={`Search InspireHEP...`} onSearchTextChange={setSearchText} throttle>
-     {(searchText && data && data.hits && Array.isArray(data.hits.hits) ? data.hits.hits : []).map((item, index) => (
-        <List.Item 
-          key={item.id} 
-          title={`${index + 1 + indexOffset}. ${item.metadata.titles[0].title}`} 
+    <List isLoading={isLoading} searchBarPlaceholder={`Search InspireHEP...`} searchText={searchText} onSearchTextChange={setSearchText} throttle>
+      {(searchText && data && data.hits && Array.isArray(data.hits.hits) ? data.hits.hits : []).map((item, index) => (
+        <List.Item
+          key={item.id}
+          title={`${index + 1 + indexOffset}. ${item.metadata.titles[0].title}`}
           subtitle={abbreviateNames(item.metadata.authors)}
-          accessories={[{text: `${item.metadata.citation_count}`},  {text:`(${item.created.slice(0,4)})`}]}
-          actions={
-            <ActionPanel title="Inspire HEP Search">
-              <ActionPanel.Section title="Navigation">
-                <Action
-                  title="Next Page"
-                  shortcut={{ modifiers: ["cmd"], key: "arrowRight" }}
-                  onAction={() => {
-                    setPageNumber(pageNumber + 1);
-                  }}
-                />
-                <Action
-                  title="Previous Page"
-                  shortcut={{ modifiers: ["cmd"], key: "arrowLeft" }}
-                  onAction={() => {
-                    if (pageNumber > 1) {
-                      setPageNumber(pageNumber - 1);
-                    }
-                  }}
-                />
-              </ActionPanel.Section>
-            </ActionPanel>
-          }
+      accessories={[{ text: `${item.metadata.citation_count}` }, { text: `(${item.created.slice(0, 4)})` }]}
+      actions={
+        <ActionPanel title="Inspire HEP Search">
+          <Action
+            title="Show citations"
+            shortcut={{ modifiers: ["cmd"], key: "]" }}
+            icon={Icon.ArrowRightCircle}
+            onAction={showCitations(item)}
+          />
+          <ActionPanel.Section title="Navigation">
+            <Action
+              title="Next Page"
+              shortcut={{ modifiers: ["cmd"], key: "arrowRight" }}
+              onAction={() => {
+                setPageNumber(pageNumber + 1);
+              }}
+            />
+            <Action
+              title="Previous Page"
+              shortcut={{ modifiers: ["cmd"], key: "arrowLeft" }}
+              onAction={() => {
+                if (pageNumber > 1) {
+                  setPageNumber(pageNumber - 1);
+                }
+              }}
+            />
+          </ActionPanel.Section>
+        </ActionPanel>
+      }
         />
       ))}
     </List>

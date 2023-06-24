@@ -24,6 +24,7 @@ setTimeout(function(){
     console.log(results.hits.hits[1].metadata.citation_count);
     console.log(results.hits.hits[1].created.slice(0,4));
     console.log(results.hits.hits[1].links.bibtex);
+    console.log(results.hits.hits[1].id);
     console.log(results.hits.hits[1].links.citations);
 }, 3000);
 
