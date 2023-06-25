@@ -61,6 +61,7 @@ export default function Command() {
                 <Action
                   title="Next Page"
                   shortcut={{ modifiers: ["cmd"], key: "arrowRight" }}
+                  icon={Icon.ChevronRight}
                   onAction={() => {
                     setPageNumber(pageNumber + 1);
                   }}
@@ -68,6 +69,7 @@ export default function Command() {
                 <Action
                   title="Previous Page"
                   shortcut={{ modifiers: ["cmd"], key: "arrowLeft" }}
+                  icon={Icon.ChevronLeft}
                   onAction={() => {
                     if (pageNumber > 1) {
                       setPageNumber(pageNumber - 1);
