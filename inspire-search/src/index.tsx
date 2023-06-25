@@ -20,10 +20,15 @@ export default function Command() {
     };
   }
 
+  function showReferences(item) {
+    return () => {
+      setSearchText(`citedby:recid:${item.id}`);
+    };
+  }
+
   useEffect(() => {
     setPageNumber(1);
     setIndexOffset(0);
-    console.log(searchText);
   }, [searchText]);
 
   useEffect(() => {
@@ -41,10 +46,16 @@ export default function Command() {
           actions={
             <ActionPanel title="Inspire HEP Search">
               <Action
-                title="Show citations"
+                title="Show Citations"
                 shortcut={{ modifiers: ["cmd"], key: "]" }}
                 icon={Icon.ArrowRightCircle}
                 onAction={showCitations(item)}
+              />
+              <Action
+                title="Show References"
+                shortcut={{ modifiers: ["cmd"], key: "[" }}
+                icon={Icon.ArrowLeftCircle}
+                onAction={showReferences(item)}
               />
               <ActionPanel.Section title="Navigation">
                 <Action
