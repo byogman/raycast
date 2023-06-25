@@ -9,6 +9,7 @@ export default function Command() {
   const [searchText, setSearchText] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
   const [indexOffset, setIndexOffset] = useState(0);
+  const [resultsNumber, setResultsNumber] = useState(0);
   const { isLoading, data } = useFetch(`${API_PATH}&sort=mostrecent&page=${pageNumber}&q=${searchText}`, {
     // to make sure the screen isn't flickering when the searchText changes
     keepPreviousData: true,
@@ -35,6 +36,10 @@ export default function Command() {
     setIndexOffset((pageNumber - 1) * 9);
   }, [pageNumber]);
 
+  useEffect(() => {
+    setResultsNumber(data.hits.total);
+  }, [data]);
+
   return (
     <List isLoading={isLoading} searchBarPlaceholder={`Search InspireHEP...`} searchText={searchText} onSearchTextChange={setSearchText} throttle>
       {(searchText && data && data.hits && Array.isArray(data.hits.hits) ? data.hits.hits : []).map((item, index) => (
@@ -58,14 +63,16 @@ export default function Command() {
                 onAction={showReferences(item)}
               />
               <ActionPanel.Section title="Navigation">
-                <Action
-                  title="Next Page"
-                  shortcut={{ modifiers: ["cmd"], key: "arrowRight" }}
-                  icon={Icon.ChevronRight}
-                  onAction={() => {
-                    setPageNumber(pageNumber + 1);
-                  }}
-                />
+                  <Action
+                    title="Next Page"
+                    shortcut={{ modifiers: ["cmd"], key: "arrowRight" }}
+                    icon={Icon.ChevronRight}
+                    onAction={() => {
+                      if (pageNumber < Math.ceil(resultsNumber / 9)) {
+                      setPageNumber(pageNumber + 1);
+                      }
+                    }}
+                  />
                 <Action
                   title="Previous Page"
                   shortcut={{ modifiers: ["cmd"], key: "arrowLeft" }}
