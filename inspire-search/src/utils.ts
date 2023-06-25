@@ -5,3 +5,7 @@ export function abbreviateNames(names) {
     return `${first.charAt(0)}. ${last}`;
   }).join(", ");
 }
+
+export function displayCollaborations(collaborations) {
+  return collaborations.map(obj => obj.value).join(', ');
+}
