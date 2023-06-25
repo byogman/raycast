@@ -1,9 +1,9 @@
 import { Action, ActionPanel, Icon, List } from "@raycast/api";
 import { useState, useEffect } from "react";
 import { useFetch } from "@raycast/utils";
-import { abbreviateNames } from "./utils";
+import { abbreviateNames, displayCollaborations } from "./utils";
 
-const API_PATH = 'https://inspirehep.net/api/literature?fields=titles,authors.full_name,citation_count&size=9';
+const API_PATH = 'https://inspirehep.net/api/literature?fields=titles,collaborations,authors.full_name,citation_count&size=9';
 
 export default function Command() {
   const [searchText, setSearchText] = useState("");
@@ -13,15 +13,17 @@ export default function Command() {
     // to make sure the screen isn't flickering when the searchText changes
     keepPreviousData: true,
   });
-  const showCitations = (item) => {
+
+  function showCitations(item) {
     return () => {
       setSearchText(`refersto:recid:${item.id}`);
-    }
-  };
+    };
+  }
 
   useEffect(() => {
     setPageNumber(1);
     setIndexOffset(0);
+    console.log(searchText);
   }, [searchText]);
 
   useEffect(() => {
@@ -34,7 +36,7 @@ export default function Command() {
         <List.Item
           key={item.id}
           title={`${index + 1 + indexOffset}. ${item.metadata.titles[0].title}`}
-          subtitle={abbreviateNames(item.metadata.authors)}
+          subtitle={item.metadata.authors ? abbreviateNames(item.metadata.authors) : displayCollaborations(item.metadata.collaborations)}
           accessories={[{ text: `${item.metadata.citation_count}` }, { text: `(${item.created.slice(0, 4)})` }]}
           actions={
             <ActionPanel title="Inspire HEP Search">
