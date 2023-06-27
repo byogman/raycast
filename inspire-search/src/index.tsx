@@ -94,6 +94,8 @@ export default function Command() {
             onAction={() => {
               if (memory.length > 0) {
                 goBack();
+              } else {
+                setSearchText("");
               }
             }}
           />
