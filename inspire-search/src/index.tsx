@@ -10,35 +10,56 @@ export default function Command() {
   const [pageNumber, setPageNumber] = useState(1);
   const [indexOffset, setIndexOffset] = useState(0);
   const [resultsNumber, setResultsNumber] = useState(0);
+  const [memory, setMemory] = useState([]);
+  const [startingPage, setStartingPage] = useState(1);
   const { isLoading, data } = useFetch(`${API_PATH}&sort=mostrecent&page=${pageNumber}&q=${searchText}`, {
     // to make sure the screen isn't flickering when the searchText changes
     keepPreviousData: true,
   });
 
+  function memorizePreviousSearch() {
+    memory.push({ query: searchText, page: pageNumber });
+  }
+
   function showCitations(item) {
     return () => {
+      memorizePreviousSearch();
       setSearchText(`refersto:recid:${item.id}`);
     };
   }
 
   function showReferences(item) {
     return () => {
+      memorizePreviousSearch();
       setSearchText(`citedby:recid:${item.id}`);
     };
   }
 
-  useEffect(() => {
-    setPageNumber(1);
-    setIndexOffset(0);
-  }, [searchText]);
+  function goBack() {
+    const previousSearch = memory.pop();
+    setStartingPage(previousSearch.page);
+    setSearchText(previousSearch.query);
+    }
 
-  useEffect(() => {
-    setIndexOffset((pageNumber - 1) * 9);
-  }, [pageNumber]);
+  // updates number of results when new data are fetched
 
   useEffect(() => {
     setResultsNumber(data.hits.total);
   }, [data]);
+
+  // resets page number after new search
+
+  useEffect(() => {
+    setPageNumber(startingPage); 
+    setIndexOffset(0);
+    setStartingPage(1);
+  }, [searchText]);
+
+  // updates numerical indices when page number changes
+
+  useEffect(() => {
+    setIndexOffset((pageNumber - 1) * 9);
+  }, [pageNumber]);
 
   return (
     <List isLoading={isLoading} searchBarPlaceholder={`Search InspireHEP...`} searchText={searchText} onSearchTextChange={setSearchText} throttle>
@@ -63,16 +84,16 @@ export default function Command() {
                 onAction={showReferences(item)}
               />
               <ActionPanel.Section title="Navigation">
-                  <Action
-                    title="Next Page"
-                    shortcut={{ modifiers: ["cmd"], key: "arrowRight" }}
-                    icon={Icon.ChevronRight}
-                    onAction={() => {
-                      if (pageNumber < Math.ceil(resultsNumber / 9)) {
+                <Action
+                  title="Next Page"
+                  shortcut={{ modifiers: ["cmd"], key: "arrowRight" }}
+                  icon={Icon.ChevronRight}
+                  onAction={() => {
+                    if (pageNumber < Math.ceil(resultsNumber / 9)) {
                       setPageNumber(pageNumber + 1);
-                      }
-                    }}
-                  />
+                    }
+                  }}
+                />
                 <Action
                   title="Previous Page"
                   shortcut={{ modifiers: ["cmd"], key: "arrowLeft" }}
@@ -80,6 +101,16 @@ export default function Command() {
                   onAction={() => {
                     if (pageNumber > 1) {
                       setPageNumber(pageNumber - 1);
+                    }
+                  }}
+                />
+                <Action
+                  title="Go Back"
+                  shortcut={{ modifiers: ["cmd"], key: "delete" }}
+                  icon={Icon.Undo}
+                  onAction={() => {
+                    if (memory.length > 0) {
+                      goBack();
                     }
                   }}
                 />
