@@ -1,7 +1,7 @@
 import { Action, ActionPanel, Icon, List } from "@raycast/api";
 import { useState, useEffect } from "react";
 import { useFetch } from "@raycast/utils";
-import { abbreviateNames, displayCollaborations, goBack } from "./utils";
+import { abbreviateNames, displayCollaborations } from "./utils";
 
 const API_PATH = 'https://inspirehep.net/api/literature?fields=titles,collaborations,authors.full_name,citation_count&size=9';
 
