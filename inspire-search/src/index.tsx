@@ -47,6 +47,11 @@ export default function Command() {
   function listActions(item) {
     return (
       <ActionPanel title="Inspire HEP Search">
+        <Action.OpenInBrowser
+          url={selectUrl(item)}
+          shortcut={{ modifiers: ["cmd"], key: "o" }}
+          icon={Icon.Globe}
+        />
         <Action
           title="Show Citations"
           shortcut={{ modifiers: ["cmd"], key: "]" }}
@@ -95,6 +100,16 @@ export default function Command() {
         </ActionPanel.Section>
       </ActionPanel>
     )
+  };
+
+  function selectUrl(item) {
+    if (item.metadata.arxiv_eprints) {
+      return `https://arxiv.org/pdf/${item.metadata.arxiv_eprints[0].value}`
+    } else if (item.metadata.dois) {
+      return `https://doi.org/${item.metadata.dois[0].value}`
+    } else {
+      return `https://inspirehep.net/literature/${item.id}`
+    }
   };
 
   function memorizePreviousSearch() {
