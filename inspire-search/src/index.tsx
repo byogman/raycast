@@ -3,25 +3,18 @@ import { useState, useEffect } from "react";
 import { useFetch } from "@raycast/utils";
 import { abbreviateNames, displayCollaborations } from "./utils";
 
-const API_PATH = 'https://inspirehep.net/api/literature?fields=titles,collaborations,authors.full_name,citation_count&size=9';
+const API_PATH = 'https://inspirehep.net/api/literature?fields=titles,collaborations,authors.full_name,citation_count,dois,arxiv_eprints&size=9';
 
 export default function Command() {
   const [searchText, setSearchText] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
   const [indexOffset, setIndexOffset] = useState(0);
-  const [resultsNumber, setResultsNumber] = useState(0);
   const [memory, setMemory] = useState([]);
   const [startingPage, setStartingPage] = useState(1);
   const { isLoading, data } = useFetch(`${API_PATH}&sort=mostrecent&page=${pageNumber}&q=${searchText}`, {
     // to make sure the screen isn't flickering when the searchText changes
     keepPreviousData: true,
   });
-
-  // updates number of results when new data are fetched
-
-  useEffect(() => {
-    setResultsNumber(data.hits.total);
-  }, [data]);
 
   // resets page number after new search
 
@@ -72,7 +65,7 @@ export default function Command() {
             shortcut={{ modifiers: ["cmd"], key: "arrowRight" }}
             icon={Icon.ChevronRight}
             onAction={() => {
-              if (pageNumber < Math.ceil(resultsNumber / 9)) {
+              if (pageNumber < Math.ceil(data.hits.total / 9)) {
                 setPageNumber(pageNumber + 1);
               }
             }}

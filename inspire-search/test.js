@@ -9,20 +9,30 @@ async function fetchInspireHepData(query) {
 
 let results;
 
-let n = 6;
+let n = 0;
 
-fetchInspireHepData("refersto:recid:1367306")
+function abbreviateNames(names) {
+  return names.map(({ full_name }) => {
+    const [last, first = ""] = full_name.split(", ");
+    const abbreviatedFirst = first ? `${first.charAt(0)}. ` : "";
+    return `${abbreviatedFirst}${last}`;
+  }).join(", ");
+}
+
+
+fetchInspireHepData("2103.05419")
 	.then(data => {
 		results = data;
    	})
   	.catch(error => console.error(error));
 	
 setTimeout(function(){
-  console.log(results.hits.total);
-	// console.log(results.hits.hits[n]);
+  // console.log(results.hits.hits[0].metadata.authors[0]);
+	// console.log(abbreviateNames([results.hits.hits[0].metadata.authors]));
+  console.log(abbreviateNames(results.hits.hits[0].metadata.authors));
 	// console.log(results.hits.hits[n].metadata.titles[0].title);
 	// // console.log(results.hits.hits[n].metadata.arxiv_eprints[0].value);
-  //   // console.log(results.hits.hits[n].metadata.authors.map(obj => obj.full_name).join(', '));
+    // console.log(results.hits.hits[n].metadata.authors);
   //   console.log(results.hits.hits[n].metadata.authors);
   //   console.log(results.hits.hits[n].metadata.collaborations.map(obj => obj.value).join(', '));
   //   console.log(results.hits.hits[n].metadata.citation_count);
