@@ -12,6 +12,7 @@ export default function Command() {
   const [memory, setMemory] = useState([]);
   const [startingPage, setStartingPage] = useState(1);
   const { isLoading, data } = useFetch(`${API_PATH}&sort=mostrecent&page=${pageNumber}&q=${searchText}`, {
+    execute: !!searchText,
     // to make sure the screen isn't flickering when the searchText changes
     keepPreviousData: true,
   });
@@ -30,6 +31,7 @@ export default function Command() {
     setIndexOffset((pageNumber - 1) * 9);
   }, [pageNumber]);
 
+
   return (
     <List isLoading={isLoading} searchBarPlaceholder={`Search InspireHEP...`} searchText={searchText} onSearchTextChange={setSearchText} throttle>
       {(searchText && data && data.hits && Array.isArray(data.hits.hits) ? data.hits.hits : []).map((item, index) => (
@@ -43,6 +45,7 @@ export default function Command() {
       ))}
     </List>
   );
+
 
   function listActions(item) {
     return (
