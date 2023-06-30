@@ -1,6 +1,6 @@
 async function fetchInspireHepData(query) {
   try {
-    const response = await fetch(`https://inspirehep.net/api/literature?fields=titles,collaborations,authors.full_name,citation_count,arxiv_eprints&sort=mostrecent&size=10&page=1&q=${query}`);
+    const response = await fetch(`https://inspirehep.net/api/literature?fields=titles,collaborations,authors.full_name,citation_count,arxiv_eprints,dois&sort=mostrecent&size=10&page=1&q=${query}`);
     return response.json();
   } catch (error) {
     console.error(error);
@@ -20,16 +20,16 @@ function abbreviateNames(names) {
 }
 
 
-fetchInspireHepData("2103.05419")
+fetchInspireHepData("hep-th/0605061")
 	.then(data => {
 		results = data;
    	})
   	.catch(error => console.error(error));
 	
 setTimeout(function(){
-  // console.log(results.hits.hits[0].metadata.authors[0]);
+  console.log(results.hits.hits[0].metadata);
 	// console.log(abbreviateNames([results.hits.hits[0].metadata.authors]));
-  console.log(abbreviateNames(results.hits.hits[0].metadata.authors));
+  // console.log(abbreviateNames(results.hits.hits[0].metadata.authors));
 	// console.log(results.hits.hits[n].metadata.titles[0].title);
 	// // console.log(results.hits.hits[n].metadata.arxiv_eprints[0].value);
     // console.log(results.hits.hits[n].metadata.authors);
