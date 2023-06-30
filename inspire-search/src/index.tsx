@@ -8,9 +8,8 @@ const API_PATH = 'https://inspirehep.net/api/literature?fields=titles,collaborat
 export default function Command() {
   const [searchText, setSearchText] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
-  const [indexOffset, setIndexOffset] = useState(0);
-  const [memory, setMemory] = useState([]);
   const [startingPage, setStartingPage] = useState(1);
+  const [memory, setMemory] = useState([]);
   const { isLoading, data } = useFetch(`${API_PATH}&sort=mostrecent&page=${pageNumber}&q=${searchText}`, {
     execute: !!searchText,
     // to make sure the screen isn't flickering when the searchText changes
@@ -21,25 +20,17 @@ export default function Command() {
 
   useEffect(() => {
     setPageNumber(startingPage);
-    setIndexOffset(0);
     setStartingPage(1);
   }, [searchText]);
-
-  // updates numerical indices when page number changes
-
-  useEffect(() => {
-    setIndexOffset((pageNumber - 1) * 9);
-  }, [pageNumber]);
-
 
   return (
     <List isLoading={isLoading} searchBarPlaceholder={`Search InspireHEP...`} searchText={searchText} onSearchTextChange={setSearchText} throttle>
       {(searchText && data && data.hits && Array.isArray(data.hits.hits) ? data.hits.hits : []).map((item, index) => (
         <List.Item
           key={item.id}
-          title={`${index + 1 + indexOffset}. ${item.metadata.titles[0].title}`}
+          title={`${index + 9*pageNumber - 8}. ${item.metadata.titles[0].title}`}
           subtitle={item.metadata.authors ? abbreviateNames(item.metadata.authors) : displayCollaborations(item.metadata.collaborations)}
-          accessories={[{ text: `${item.metadata.citation_count}` }, { text: `(${item.created.slice(0, 4)})` }]}
+          accessories={[{ text: `${item.metadata.citation_count}` }, { text: `(${item.created.slice(0, 4)}) ` }]}
           actions={listActions(item)}
         />
       ))}
