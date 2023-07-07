@@ -1,33 +1,46 @@
-async function fetchInspireHepData(query) {
+// async function fetchInspireHepData(query) {
+//   try {
+//     const response = await fetch(`https://inspirehep.net/api/literature?fields=titles,collaborations,authors.full_name,citation_count,arxiv_eprints,dois&sort=mostrecent&size=10&page=1&q=${query}`);
+//     return response.json();
+//   } catch (error) {
+//     console.error(error);
+//   }
+// }
+
+async function bibtex() {
   try {
-    const response = await fetch(`https://inspirehep.net/api/literature?fields=titles,collaborations,authors.full_name,citation_count,arxiv_eprints,dois&sort=mostrecent&size=10&page=1&q=${query}`);
-    return response.json();
+    const response = await fetch(`https://inspirehep.net/api/literature/2054164?format=bibtex`);
+    const body = await response.text(); // Extract the body of the response
+    return body;
   } catch (error) {
     console.error(error);
   }
 }
 
-let results;
+let result = bibtex();
 
-let n = 0;
+setTimeout(function () {
+  result.then((body) => console.log(body)); // Log the body of the response
+}, 1000);
+// let n = 0;
 
-function abbreviateNames(names) {
-  return names.map(({ full_name }) => {
-    const [last, first = ""] = full_name.split(", ");
-    const abbreviatedFirst = first ? `${first.charAt(0)}. ` : "";
-    return `${abbreviatedFirst}${last}`;
-  }).join(", ");
-}
+// function abbreviateNames(names) {
+//   return names.map(({ full_name }) => {
+//     const [last, first = ""] = full_name.split(", ");
+//     const abbreviatedFirst = first ? `${first.charAt(0)}. ` : "";
+//     return `${abbreviatedFirst}${last}`;
+//   }).join(", ");
+// }
 
 
-fetchInspireHepData("hep-th/0605061")
-	.then(data => {
-		results = data;
-   	})
-  	.catch(error => console.error(error));
+// fetchInspireHepData("hep-th/0605061")
+// 	.then(data => {
+// 		results = data;
+//    	})
+//   	.catch(error => console.error(error));
 	
-setTimeout(function(){
-  console.log(results.hits.hits[0].metadata);
+// setTimeout(function(){
+//   console.log(result);
 	// console.log(abbreviateNames([results.hits.hits[0].metadata.authors]));
   // console.log(abbreviateNames(results.hits.hits[0].metadata.authors));
 	// console.log(results.hits.hits[n].metadata.titles[0].title);
@@ -40,5 +53,5 @@ setTimeout(function(){
   //   console.log(results.hits.hits[n].links.bibtex);
   //   console.log(results.hits.hits[n].id);
   //   console.log(results.hits.hits[n].links.citations);
-}, 3000);
+// }, 5000);
 

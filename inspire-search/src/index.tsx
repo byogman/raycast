@@ -1,4 +1,4 @@
-import { Action, ActionPanel, Icon, List, popToRoot, showHUD } from "@raycast/api";
+import { Action, ActionPanel, Clipboard, Icon, List, showToast, Toast } from "@raycast/api";
 import { useState, useEffect } from "react";
 import { useFetch } from "@raycast/utils";
 import { abbreviateNames, displayCollaborations } from "./utils";
@@ -13,17 +13,29 @@ export default function Command() {
   const [bibtexUrl, setBibtexUrl] = useState("");
   const { isLoading, data } = useFetch(`${API_PATH}&sort=mostrecent&page=${pageNumber}&q=${searchText}`, {
     execute: !!searchText,
+    parseResponse: ((response) => response.json()),
     // to make sure the screen isn't flickering when the searchText changes
     keepPreviousData: true,
   });
 
   const { _isLoadingBibtexRecord, _bibtexRecord } = useFetch(bibtexUrl, {
     execute: !!bibtexUrl,
-    onData: ((_bibtexRecord) => { 
-      console.log(_bibtexRecord);  // edit this to copy to clipboard
-      showHUD("🟢 Copied to Clipboard");   // optmistic update? progress indicator using isLoadingBibtexRecord? speed-up? 
-      popToRoot({ clearSearchBar: true });
-     }),
+    parseResponse: ((response) => response.text()),
+    onWillExecute: (() => showToast({
+      style: Toast.Style.Animated,
+      title: "Downloading BibTeX Record",
+    })),
+    onData: ((response) => {
+      Clipboard.copy(response);
+      showToast({
+        style: Toast.Style.Success,
+        title: "Copied to Clipboard",
+      });
+    }),
+    onError: (() => showToast({
+      style: Toast.Style.Error,
+      title: "Not Found",
+    }))
   });
 
   // resets page number after new search
