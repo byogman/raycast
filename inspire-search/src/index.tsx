@@ -9,8 +9,10 @@ export default function Command() {
   const [searchText, setSearchText] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
   const [startingPage, setStartingPage] = useState(1);
-  const [memory, _setMemory] = useState([]);
+  const [searchMemory, _setSearchMemory] = useState([]);
+  const [clipboardMemory, setClipboardMemory] = useState("");
   const [bibtexUrl, setBibtexUrl] = useState("");
+  const [clipboardFlag, setClipboardFlag] = useState(false);
   const { isLoading, data } = useFetch(`${API_PATH}&sort=mostrecent&page=${pageNumber}&q=${searchText}`, {
     execute: !!searchText,
     parseResponse: ((response) => response.json()),
@@ -26,11 +28,21 @@ export default function Command() {
       title: "Downloading BibTeX Record",
     })),
     onData: ((response) => {
-      Clipboard.copy(response);
-      showToast({
-        style: Toast.Style.Success,
-        title: "Copied to Clipboard",
-      });
+      if (clipboardFlag) {
+        Clipboard.copy(clipboardMemory + '\n' + response);
+        setClipboardMemory(clipboardMemory + '\n' + response);
+        showToast({
+          style: Toast.Style.Success,
+          title: "Added to Clipboard",
+        });
+      } else {
+        Clipboard.copy(response);
+        setClipboardMemory(response);
+        showToast({
+          style: Toast.Style.Success,
+          title: "Copied to Clipboard",
+        });
+      };
     }),
     onError: (() => showToast({
       style: Toast.Style.Error,
@@ -56,7 +68,7 @@ export default function Command() {
   };
 
   function memorizePreviousSearch() {
-    memory.push({ query: searchText, page: pageNumber });
+    searchMemory.push({ query: searchText, page: pageNumber });
   };
 
   function showCitations(item) {
@@ -74,7 +86,7 @@ export default function Command() {
   };
 
   function goBack() {
-    const previousSearch = memory.pop();
+    const previousSearch = searchMemory.pop();
     setStartingPage(previousSearch.page);
     setSearchText(previousSearch.query);
   };
@@ -92,9 +104,19 @@ export default function Command() {
           shortcut={{ modifiers: ["cmd"], key: "b" }}
           icon={Icon.Clipboard}
           onAction={() => {
+            setClipboardFlag(false);
             setBibtexUrl(item.links.bibtex);
           }}
         />
+        <Action
+        title="Add BibTeX to Clipboard"
+        shortcut={{ modifiers: ["shift", "cmd"], key: "b" }}
+        icon={Icon.Clipboard}
+        onAction={() => {
+          setClipboardFlag(true);
+          setBibtexUrl(item.links.bibtex);
+        }}
+      />
         <Action
           title="Show Citations"
           shortcut={{ modifiers: ["cmd"], key: "]" }}
@@ -133,7 +155,7 @@ export default function Command() {
             shortcut={{ modifiers: ["cmd"], key: "delete" }}
             icon={Icon.Undo}
             onAction={() => {
-              if (memory.length > 0) {
+              if (searchMemory.length > 0) {
                 goBack();
               } else {
                 setSearchText("");
