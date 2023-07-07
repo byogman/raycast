@@ -23,20 +23,48 @@ export default function Command() {
     setStartingPage(1);
   }, [searchText]);
 
-  return (
-    <List isLoading={isLoading} searchBarPlaceholder={`Search InspireHEP...`} searchText={searchText} onSearchTextChange={setSearchText} throttle>
-      {(searchText && data && data.hits && Array.isArray(data.hits.hits) ? data.hits.hits : []).map((item, index) => (
-        <List.Item
-          key={item.id}
-          title={`${index + 9*pageNumber - 8}. ${item.metadata.titles[0].title}`}
-          subtitle={item.metadata.authors ? abbreviateNames(item.metadata.authors) : displayCollaborations(item.metadata.collaborations)}
-          accessories={[{ text: `${item.metadata.citation_count}` }, { text: `(${item.created.slice(0, 4)}) ` }]}
-          actions={listActions(item)}
-        />
-      ))}
-    </List>
-  );
+  function selectUrl(item) {
+    if (item.metadata.arxiv_eprints) {
+      return `https://arxiv.org/pdf/${item.metadata.arxiv_eprints[0].value}`
+    } else if (item.metadata.dois) {
+      return `https://doi.org/${item.metadata.dois[0].value}`
+    } else {
+      return `https://inspirehep.net/literature/${item.id}`
+    }
+  };
 
+  async function fetchBibTeXrecord( url ) {
+    try {
+      const response = await fetch( url );
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  function memorizePreviousSearch() {
+    memory.push({ query: searchText, page: pageNumber });
+  };
+
+  function showCitations(item) {
+    return () => {
+      memorizePreviousSearch();
+      setSearchText(`refersto:recid:${item.id}`);
+    };
+  };
+
+  function showReferences(item) {
+    return () => {
+      memorizePreviousSearch();
+      setSearchText(`citedby:recid:${item.id}`);
+    };
+  };
+
+  function goBack() {
+    const previousSearch = memory.pop();
+    setStartingPage(previousSearch.page);
+    setSearchText(previousSearch.query);
+  };
 
   function listActions(item) {
     return (
@@ -45,6 +73,11 @@ export default function Command() {
           url={selectUrl(item)}
           shortcut={{ modifiers: ["cmd"], key: "o" }}
           icon={Icon.Globe}
+        />
+        <Action.CopyToClipboard
+          title="Copy BibTeX to Clipboard"
+          shortcut={{ modifiers: ["cmd"], key: "b" }}
+          content={fetchBibTeXrecord( item.links.bibtex )}
         />
         <Action
           title="Show Citations"
@@ -96,37 +129,17 @@ export default function Command() {
     )
   };
 
-  function selectUrl(item) {
-    if (item.metadata.arxiv_eprints) {
-      return `https://arxiv.org/pdf/${item.metadata.arxiv_eprints[0].value}`
-    } else if (item.metadata.dois) {
-      return `https://doi.org/${item.metadata.dois[0].value}`
-    } else {
-      return `https://inspirehep.net/literature/${item.id}`
-    }
-  };
-
-  function memorizePreviousSearch() {
-    memory.push({ query: searchText, page: pageNumber });
-  };
-
-  function showCitations(item) {
-    return () => {
-      memorizePreviousSearch();
-      setSearchText(`refersto:recid:${item.id}`);
-    };
-  };
-
-  function showReferences(item) {
-    return () => {
-      memorizePreviousSearch();
-      setSearchText(`citedby:recid:${item.id}`);
-    };
-  };
-
-  function goBack() {
-    const previousSearch = memory.pop();
-    setStartingPage(previousSearch.page);
-    setSearchText(previousSearch.query);
-  };
+  return (
+    <List isLoading={isLoading} searchBarPlaceholder={`Search InspireHEP...`} searchText={searchText} onSearchTextChange={setSearchText} throttle>
+      {(searchText && data && data.hits && Array.isArray(data.hits.hits) ? data.hits.hits : []).map((item, index) => (
+        <List.Item
+          key={item.id}
+          title={`${index + 9 * pageNumber - 8}. ${item.metadata.titles[0].title}`}
+          subtitle={item.metadata.authors ? abbreviateNames(item.metadata.authors) : displayCollaborations(item.metadata.collaborations)}
+          accessories={[{ text: `${item.metadata.citation_count}` }, { text: `(${item.created.slice(0, 4)}) ` }]}
+          actions={listActions(item)}
+        />
+      ))}
+    </List>
+  );
 };
