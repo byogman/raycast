@@ -1,4 +1,4 @@
-import { Action, ActionPanel, Icon, List } from "@raycast/api";
+import { Action, ActionPanel, Clipboard, Icon, List, showToast, Toast } from "@raycast/api";
 import { useState, useEffect } from "react";
 import { useFetch } from "@raycast/utils";
 import { abbreviateNames, displayCollaborations } from "./utils";
@@ -9,11 +9,33 @@ export default function Command() {
   const [searchText, setSearchText] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
   const [startingPage, setStartingPage] = useState(1);
-  const [memory, setMemory] = useState([]);
+  const [memory, _setMemory] = useState([]);
+  const [bibtexUrl, setBibtexUrl] = useState("");
   const { isLoading, data } = useFetch(`${API_PATH}&sort=mostrecent&page=${pageNumber}&q=${searchText}`, {
     execute: !!searchText,
+    parseResponse: ((response) => response.json()),
     // to make sure the screen isn't flickering when the searchText changes
     keepPreviousData: true,
+  });
+
+  const { _isLoadingBibtexRecord, _bibtexRecord } = useFetch(bibtexUrl, {
+    execute: !!bibtexUrl,
+    parseResponse: ((response) => response.text()),
+    onWillExecute: (() => showToast({
+      style: Toast.Style.Animated,
+      title: "Downloading BibTeX Record",
+    })),
+    onData: ((response) => {
+      Clipboard.copy(response);
+      showToast({
+        style: Toast.Style.Success,
+        title: "Copied to Clipboard",
+      });
+    }),
+    onError: (() => showToast({
+      style: Toast.Style.Error,
+      title: "Not Found",
+    }))
   });
 
   // resets page number after new search
@@ -23,20 +45,39 @@ export default function Command() {
     setStartingPage(1);
   }, [searchText]);
 
-  return (
-    <List isLoading={isLoading} searchBarPlaceholder={`Search InspireHEP...`} searchText={searchText} onSearchTextChange={setSearchText} throttle>
-      {(searchText && data && data.hits && Array.isArray(data.hits.hits) ? data.hits.hits : []).map((item, index) => (
-        <List.Item
-          key={item.id}
-          title={`${index + 9*pageNumber - 8}. ${item.metadata.titles[0].title}`}
-          subtitle={item.metadata.authors ? abbreviateNames(item.metadata.authors) : displayCollaborations(item.metadata.collaborations)}
-          accessories={[{ text: `${item.metadata.citation_count}` }, { text: `(${item.created.slice(0, 4)}) ` }]}
-          actions={listActions(item)}
-        />
-      ))}
-    </List>
-  );
+  function selectUrl(item) {
+    if (item.metadata.arxiv_eprints) {
+      return `https://arxiv.org/pdf/${item.metadata.arxiv_eprints[0].value}`
+    } else if (item.metadata.dois) {
+      return `https://doi.org/${item.metadata.dois[0].value}`
+    } else {
+      return `https://inspirehep.net/literature/${item.id}`
+    }
+  };
 
+  function memorizePreviousSearch() {
+    memory.push({ query: searchText, page: pageNumber });
+  };
+
+  function showCitations(item) {
+    return () => {
+      memorizePreviousSearch();
+      setSearchText(`refersto:recid:${item.id}`);
+    };
+  };
+
+  function showReferences(item) {
+    return () => {
+      memorizePreviousSearch();
+      setSearchText(`citedby:recid:${item.id}`);
+    };
+  };
+
+  function goBack() {
+    const previousSearch = memory.pop();
+    setStartingPage(previousSearch.page);
+    setSearchText(previousSearch.query);
+  };
 
   function listActions(item) {
     return (
@@ -45,6 +86,14 @@ export default function Command() {
           url={selectUrl(item)}
           shortcut={{ modifiers: ["cmd"], key: "o" }}
           icon={Icon.Globe}
+        />
+        <Action
+          title="Copy BibTeX to Clipboard"
+          shortcut={{ modifiers: ["cmd"], key: "b" }}
+          icon={Icon.Clipboard}
+          onAction={() => {
+            setBibtexUrl(item.links.bibtex);
+          }}
         />
         <Action
           title="Show Citations"
@@ -96,37 +145,21 @@ export default function Command() {
     )
   };
 
-  function selectUrl(item) {
-    if (item.metadata.arxiv_eprints) {
-      return `https://arxiv.org/pdf/${item.metadata.arxiv_eprints[0].value}`
-    } else if (item.metadata.dois) {
-      return `https://doi.org/${item.metadata.dois[0].value}`
-    } else {
-      return `https://inspirehep.net/literature/${item.id}`
-    }
-  };
-
-  function memorizePreviousSearch() {
-    memory.push({ query: searchText, page: pageNumber });
-  };
-
-  function showCitations(item) {
-    return () => {
-      memorizePreviousSearch();
-      setSearchText(`refersto:recid:${item.id}`);
-    };
-  };
-
-  function showReferences(item) {
-    return () => {
-      memorizePreviousSearch();
-      setSearchText(`citedby:recid:${item.id}`);
-    };
-  };
-
-  function goBack() {
-    const previousSearch = memory.pop();
-    setStartingPage(previousSearch.page);
-    setSearchText(previousSearch.query);
-  };
+  return (
+    <List isLoading={isLoading}
+      searchBarPlaceholder={`Search InspireHEP...`}
+      searchText={searchText}
+      onSearchTextChange={setSearchText}
+      throttle>
+      {(searchText && data && data.hits && Array.isArray(data.hits.hits) ? data.hits.hits : []).map((item, index) => (
+        <List.Item
+          key={item.id}
+          title={`${index + 9 * pageNumber - 8}. ${item.metadata.titles[0].title}`}
+          subtitle={item.metadata.authors ? abbreviateNames(item.metadata.authors) : displayCollaborations(item.metadata.collaborations)}
+          accessories={[{ text: `${item.metadata.citation_count}` }, { text: `(${item.created.slice(0, 4)}) ` }]}
+          actions={listActions(item)}
+        />
+      ))}
+    </List>
+  );
 };
