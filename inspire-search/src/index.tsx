@@ -10,11 +10,16 @@ export default function Command() {
   const [pageNumber, setPageNumber] = useState(1);
   const [startingPage, setStartingPage] = useState(1);
   const [memory, setMemory] = useState([]);
-  const { isLoading, data } = useFetch(`${API_PATH}&sort=mostrecent&page=${pageNumber}&q=${searchText}`, {
+  const [bibtexUrl, setBibtexUrl] = useState[""];
+  const { isLoadingData, data } = useFetch(`${API_PATH}&sort=mostrecent&page=${pageNumber}&q=${searchText}`, {
     execute: !!searchText,
     // to make sure the screen isn't flickering when the searchText changes
     keepPreviousData: true,
   });
+  // const { isLoadingBibtexRecord, bibtexRecord } = useFetch(bibtexUrl, {
+  //   execute: !!bibtexUrl,
+  //   onData: ( (bibtexRecord) => { console.log(bibtexRecord) } ),
+  // });
 
   // resets page number after new search
 
@@ -32,15 +37,6 @@ export default function Command() {
       return `https://inspirehep.net/literature/${item.id}`
     }
   };
-
-  async function fetchBibTeXrecord( url ) {
-    try {
-      const response = await fetch( url );
-      return response;
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
   function memorizePreviousSearch() {
     memory.push({ query: searchText, page: pageNumber });
@@ -74,11 +70,12 @@ export default function Command() {
           shortcut={{ modifiers: ["cmd"], key: "o" }}
           icon={Icon.Globe}
         />
-        <Action.CopyToClipboard
+        {/* <Action
           title="Copy BibTeX to Clipboard"
           shortcut={{ modifiers: ["cmd"], key: "b" }}
-          content={fetchBibTeXrecord( item.links.bibtex )}
-        />
+          icon={Icon.Paste}
+          onAction={setBibtexUrl(item.links.bibtex)} 
+        /> */}
         <Action
           title="Show Citations"
           shortcut={{ modifiers: ["cmd"], key: "]" }}
@@ -130,7 +127,7 @@ export default function Command() {
   };
 
   return (
-    <List isLoading={isLoading} searchBarPlaceholder={`Search InspireHEP...`} searchText={searchText} onSearchTextChange={setSearchText} throttle>
+    <List isLoading={isLoadingData} searchBarPlaceholder={`Search InspireHEP...`} searchText={searchText} onSearchTextChange={setSearchText} throttle>
       {(searchText && data && data.hits && Array.isArray(data.hits.hits) ? data.hits.hits : []).map((item, index) => (
         <List.Item
           key={item.id}
