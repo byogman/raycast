@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Action, ActionPanel, Clipboard, Icon, List, showToast, Toast } from "@raycast/api";
 import { useFetch } from "@raycast/utils";
+import { selectUrl } from './utils';
 import ItemComponent from './ItemComponent';
 
 const API_PATH = 'https://inspirehep.net/api/literature?fields=titles,collaborations,authors.full_name,citation_count,dois,arxiv_eprints&size=9';
@@ -50,16 +51,6 @@ export default function Command() {
       title: "Not Found",
     }))
   });
-
-  function selectUrl(item) {
-    if (item.metadata.arxiv_eprints) {
-      return `https://arxiv.org/pdf/${item.metadata.arxiv_eprints[0].value}`
-    } else if (item.metadata.dois) {
-      return `https://doi.org/${item.metadata.dois[0].value}`
-    } else {
-      return `https://inspirehep.net/literature/${item.id}`
-    }
-  };
 
   function memorizePreviousSearch() {
     searchMemory.push({ query: searchText, page: pageNumber });
