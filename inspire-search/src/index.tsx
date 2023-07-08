@@ -1,7 +1,7 @@
-import { Action, ActionPanel, Clipboard, Icon, List, showToast, Toast } from "@raycast/api";
 import { useState, useEffect } from "react";
+import { Action, ActionPanel, Clipboard, Icon, List, showToast, Toast } from "@raycast/api";
 import { useFetch } from "@raycast/utils";
-import { abbreviateNames, displayCollaborations } from "./utils";
+import ItemComponent from './ItemComponent';
 
 const API_PATH = 'https://inspirehep.net/api/literature?fields=titles,collaborations,authors.full_name,citation_count,dois,arxiv_eprints&size=9';
 
@@ -13,6 +13,7 @@ export default function Command() {
   const [clipboardMemory, setClipboardMemory] = useState("");
   const [bibtexUrl, setBibtexUrl] = useState("");
   const [clipboardFlag, setClipboardFlag] = useState(false);
+  
   const { isLoading, data } = useFetch(`${API_PATH}&sort=mostrecent&page=${pageNumber}&q=${searchText}`, {
     execute: !!searchText,
     parseResponse: ((response) => response.json()),
@@ -49,13 +50,6 @@ export default function Command() {
       title: "Not Found",
     }))
   });
-
-  // resets page number after new search
-
-  useEffect(() => {
-    setPageNumber(startingPage);
-    setStartingPage(1);
-  }, [searchText]);
 
   function selectUrl(item) {
     if (item.metadata.arxiv_eprints) {
@@ -109,14 +103,14 @@ export default function Command() {
           }}
         />
         <Action
-        title="Add BibTeX to Clipboard"
-        shortcut={{ modifiers: ["shift", "cmd"], key: "b" }}
-        icon={Icon.Clipboard}
-        onAction={() => {
-          setClipboardFlag(true);
-          setBibtexUrl(item.links.bibtex);
-        }}
-      />
+          title="Add BibTeX to Clipboard"
+          shortcut={{ modifiers: ["shift", "cmd"], key: "b" }}
+          icon={Icon.Clipboard}
+          onAction={() => {
+            setClipboardFlag(true);
+            setBibtexUrl(item.links.bibtex);
+          }}
+        />
         <Action
           title="Show Citations"
           shortcut={{ modifiers: ["cmd"], key: "]" }}
@@ -167,20 +161,23 @@ export default function Command() {
     )
   };
 
+  // resets page number after new search
+
+  useEffect(() => {
+    setPageNumber(startingPage);
+    setStartingPage(1);
+  }, [searchText]);
+
   return (
-    <List isLoading={isLoading}
-      searchBarPlaceholder={`Search InspireHEP...`}
+    <List
+      isLoading={isLoading}
+      searchBarPlaceholder="Search InspireHEP..."
       searchText={searchText}
       onSearchTextChange={setSearchText}
-      throttle>
+      throttle
+    >
       {(searchText && data && data.hits && Array.isArray(data.hits.hits) ? data.hits.hits : []).map((item, index) => (
-        <List.Item
-          key={item.id}
-          title={`${index + 9 * pageNumber - 8}. ${item.metadata.titles[0].title}`}
-          subtitle={item.metadata.authors ? abbreviateNames(item.metadata.authors) : displayCollaborations(item.metadata.collaborations)}
-          accessories={[{ text: `${item.metadata.citation_count}` }, { text: `(${item.created.slice(0, 4)}) ` }]}
-          actions={listActions(item)}
-        />
+        <ItemComponent key={item.id} item={item} index={index} page={pageNumber} itemActions={listActions(item)} />
       ))}
     </List>
   );
