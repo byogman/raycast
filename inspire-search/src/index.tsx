@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Action, ActionPanel, Clipboard, Icon, List, showToast, Toast } from "@raycast/api";
+import { Action, ActionPanel, Clipboard, getPreferenceValues, Icon, List, showToast, Toast } from "@raycast/api";
 import { useFetch } from "@raycast/utils";
 import { selectUrl } from './utils';
 import ItemComponent from './ItemComponent';
@@ -15,8 +15,9 @@ export default function Command() {
   const [clipboardMemory, setClipboardMemory] = useState("");
   const [bibtexUrl, setBibtexUrl] = useState("");
   const [clipboardFlag, setClipboardFlag] = useState(false);
+  const [ sortBy, setSortBy ] = useState(getPreferenceValues<sort>());
 
-  const { isLoading, data } = useFetch(`${API_PATH}&sort=mostrecent&page=${pageNumber}&q=${searchText}`, {
+  const { isLoading, data } = useFetch(`${API_PATH}&sort=${sortBy}&page=${pageNumber}&q=${searchText}`, {
     execute: !!searchText,
     parseResponse: ((response) => response.json()),
     // to make sure the screen isn't flickering when the searchText changes
@@ -172,6 +173,17 @@ export default function Command() {
       searchBarPlaceholder="Search InspireHEP..."
       searchText={searchText}
       onSearchTextChange={setSearchText}
+      searchBarAccessory={
+        <List.Dropdown
+          tooltip="Sort by"
+          defaultValue={getPreferenceValues<sort>()}
+          onChange={(newValue) => setSortBy(newValue)}
+        >
+          <List.Dropdown.Item key={0} title={"Most recent"} value="mostrecent" />
+          <List.Dropdown.Item key={1} title={"Least recent"} value="leastrecent" />
+          <List.Dropdown.Item key={2} title={"Most cited"} value="mostcited" />
+        </List.Dropdown>
+      }
       throttle
     >
       {(searchText && data && data.hits && Array.isArray(data.hits.hits) ? data.hits.hits : []).map((item, index) => (

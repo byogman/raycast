@@ -17,6 +17,16 @@
       "mode": "view"
     }
   ],
+  "preferences": [
+    {
+      "name": "sort",
+      "title": "Default Order",
+      "description": "Choose default ordering of search results",
+      "type": "dropdown",
+      "data": [ {"title": "Most Recent", "value": "mostrecent"}, {"title": "Least Recent", "value": "leastrecent"}, {"title": "Most Cited", "value": "mostcited"} ],
+      "default": "0"
+    }
+  ],
   "dependencies": {
     "@raycast/api": "^1.51.2",
     "@raycast/utils": "^1.7.0",
