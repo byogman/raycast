@@ -15,7 +15,7 @@ export default function Command() {
   const [clipboardMemory, setClipboardMemory] = useState("");
   const [bibtexUrl, setBibtexUrl] = useState("");
   const [clipboardFlag, setClipboardFlag] = useState(false);
-  const [ sortBy, setSortBy ] = useState(getPreferenceValues<sort>());
+  const [sortBy, setSortBy] = useState(getPreferenceValues<sort>());
 
   const { isLoading, data } = useFetch(`${API_PATH}&sort=${sortBy}&page=${pageNumber}&q=${searchText}`, {
     execute: !!searchText,
@@ -179,9 +179,9 @@ export default function Command() {
           defaultValue={getPreferenceValues<sort>()}
           onChange={(newValue) => setSortBy(newValue)}
         >
-          <List.Dropdown.Item key={0} title={"Most recent"} value="mostrecent" />
-          <List.Dropdown.Item key={1} title={"Least recent"} value="leastrecent" />
-          <List.Dropdown.Item key={2} title={"Most cited"} value="mostcited" />
+          <List.Dropdown.Item key={0} title={data && searchText ? `Most recent out of ${data.hits.total} results` : "Most recent"} value="mostrecent" />
+          <List.Dropdown.Item key={1} title={data && searchText ? `Least recent out of ${data.hits.total} results` : "Least recent"} value="leastrecent" />
+          <List.Dropdown.Item key={2} title={data && searchText ? `Most cited out of ${data.hits.total} results` : "Most cited"} value="mostcited" />
         </List.Dropdown>
       }
       throttle
