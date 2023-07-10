@@ -3,8 +3,9 @@ import { Action, ActionPanel, Clipboard, Icon, List, showToast, Toast } from "@r
 import { useFetch } from "@raycast/utils";
 import { selectUrl } from './utils';
 import ItemComponent from './ItemComponent';
+import ViewDetails from './ViewDetails';
 
-const API_PATH = 'https://inspirehep.net/api/literature?fields=titles,collaborations,authors.full_name,citation_count,dois,arxiv_eprints&size=9';
+const API_PATH = 'https://inspirehep.net/api/literature?fields=titles,collaborations,authors.full_name,citation_count,arxiv_eprints,publication_info,number_of_pages,abstracts,keywords,document_type,dois,imprints&size=9';
 
 export default function Command() {
   const [searchText, setSearchText] = useState("");
@@ -14,7 +15,7 @@ export default function Command() {
   const [clipboardMemory, setClipboardMemory] = useState("");
   const [bibtexUrl, setBibtexUrl] = useState("");
   const [clipboardFlag, setClipboardFlag] = useState(false);
-  
+
   const { isLoading, data } = useFetch(`${API_PATH}&sort=mostrecent&page=${pageNumber}&q=${searchText}`, {
     execute: !!searchText,
     parseResponse: ((response) => response.json()),
@@ -79,10 +80,28 @@ export default function Command() {
   function listActions(item) {
     return (
       <ActionPanel title="Inspire HEP Search">
+        <Action.Push
+          title="View Details"
+          shortcut={{ modifiers: [], key: "enter" }}
+          icon={Icon.List}
+          target={<ViewDetails item={item} />}
+        />
         <Action.OpenInBrowser
           url={selectUrl(item)}
-          shortcut={{ modifiers: ["cmd"], key: "o" }}
+          shortcut={{ modifiers: ["cmd"], key: "enter" }}
           icon={Icon.Globe}
+        />
+        <Action
+          title="Show Citations"
+          shortcut={{ modifiers: ["cmd"], key: "]" }}
+          icon={Icon.ArrowRightCircle}
+          onAction={showCitations(item)}
+        />
+        <Action
+          title="Show References"
+          shortcut={{ modifiers: ["cmd"], key: "[" }}
+          icon={Icon.ArrowLeftCircle}
+          onAction={showReferences(item)}
         />
         <Action
           title="Copy BibTeX to Clipboard"
@@ -101,18 +120,6 @@ export default function Command() {
             setClipboardFlag(true);
             setBibtexUrl(item.links.bibtex);
           }}
-        />
-        <Action
-          title="Show Citations"
-          shortcut={{ modifiers: ["cmd"], key: "]" }}
-          icon={Icon.ArrowRightCircle}
-          onAction={showCitations(item)}
-        />
-        <Action
-          title="Show References"
-          shortcut={{ modifiers: ["cmd"], key: "[" }}
-          icon={Icon.ArrowLeftCircle}
-          onAction={showReferences(item)}
         />
         <ActionPanel.Section title="Navigation">
           <Action
