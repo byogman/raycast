@@ -176,7 +176,7 @@ export default function Command() {
       searchBarAccessory={
         <List.Dropdown
           tooltip="Sort by"
-          defaultValue={getPreferenceValues<sort>()}
+          defaultValue={`${getPreferenceValues<sort>()}`}
           onChange={(newValue) => setSortBy(newValue)}
         >
           <List.Dropdown.Item key={0} title={data && searchText ? `Most recent of ${data.hits.total} results` : "Most recent"} value="mostrecent" />
