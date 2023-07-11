@@ -12,7 +12,7 @@ const ItemComponent = ({ item, index, itemActions, page}) => {
         setItemKey(item.id);
         setItemTitle(`${index + 9 * page - 8}. ${item.metadata.titles[0].title}`);
         setItemSubtitle(item.metadata.authors ? abbreviateNames(item.metadata.authors) : displayCollaborations(item.metadata.collaborations));
-        setItemAccessories([{ text: `${item.metadata.citation_count} ` }, { text: `(${item.created.slice(0, 4)}) ` }]);
+        setItemAccessories([{ text: `${item.metadata.citation_count} ` }, { text: `(${item.metadata.earliest_date.slice(0, 4)}) ` }]);
     }, [item]);
 
     return (

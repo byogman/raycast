@@ -5,7 +5,7 @@ import { selectUrl } from './utils';
 import ItemComponent from './ItemComponent';
 import ViewDetails from './ViewDetails';
 
-const API_PATH = 'https://inspirehep.net/api/literature?fields=titles,collaborations,authors.full_name,citation_count,arxiv_eprints,publication_info,number_of_pages,abstracts,keywords,document_type,dois,imprints&size=9';
+const API_PATH = 'https://inspirehep.net/api/literature?fields=titles,collaborations,authors.full_name,earliest_date,citation_count,arxiv_eprints,publication_info,number_of_pages,abstracts,keywords,document_type,dois,imprints&size=9';
 
 export default function Command() {
   const [searchText, setSearchText] = useState("");
