@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { List } from "@raycast/api";
 import { abbreviateNames, displayCollaborations } from "./utils";
 
-const ItemComponent = ({ item, index, itemActions, page}) => {
+const ItemComponent = ({ item, index, itemActions, page }: any) => {
     const [itemKey, setItemKey] = useState(null);
     const [itemTitle, setItemTitle] = useState('');
     const [itemSubtitle, setItemSubtitle] = useState('');
-    const [itemAccessories, setItemAccessories] = useState([]);
+    const [itemAccessories, setItemAccessories] = useState<{ text: string }[]>([]);
 
     useEffect(() => {
         setItemKey(item.id);

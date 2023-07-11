@@ -1,7 +1,7 @@
 import { Detail } from "@raycast/api";
 import { abbreviateNames, displayCollaborations } from "./utils";
 
-const ViewDetails = ({ item }) => {
+const ViewDetails = ({ item } : any ) => {
     return ( <Detail
         navigationTitle={item.metadata.titles[0].title}
         markdown={
@@ -77,7 +77,7 @@ const ViewDetails = ({ item }) => {
                 )}
                 {item.metadata.keywords && (
                     <Detail.Metadata.TagList title="Keywords">
-                        {item.metadata.keywords.map((keyword, index) => (
+                        {item.metadata.keywords.map((keyword: any, index: number) => (
                             <Detail.Metadata.TagList.Item
                                 key={index}
                                 text={keyword.value}

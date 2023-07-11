@@ -11,11 +11,11 @@ export default function Command() {
   const [searchText, setSearchText] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
   const [startingPage, setStartingPage] = useState(1);
-  const [searchMemory, _setSearchMemory] = useState([]);
+  const [searchMemory, _setSearchMemory] = useState<{query: string; page: number; }[]>([]);
   const [clipboardMemory, setClipboardMemory] = useState("");
   const [bibtexUrl, setBibtexUrl] = useState("");
   const [clipboardFlag, setClipboardFlag] = useState(false);
-  const [sortBy, setSortBy] = useState(getPreferenceValues<sort>());
+  const [sortBy, setSortBy] = useState(`${getPreferenceValues().sort}`);
 
   const { isLoading, data } = useFetch(`${API_PATH}&sort=${sortBy}&page=${pageNumber}&q=${searchText}`, {
     execute: !!searchText,
@@ -24,14 +24,14 @@ export default function Command() {
     keepPreviousData: true,
   });
 
-  const { _isLoadingBibtexRecord, _bibtexRecord } = useFetch(bibtexUrl, {
+  useFetch(bibtexUrl, {
     execute: !!bibtexUrl,
     parseResponse: ((response) => response.text()),
     onWillExecute: (() => showToast({
       style: Toast.Style.Animated,
       title: "Downloading BibTeX Record",
     })),
-    onData: ((response) => {
+    onData: ((response: string) => {
       if (clipboardFlag) {
         Clipboard.copy(clipboardMemory + '\n' + response);
         setClipboardMemory(clipboardMemory + '\n' + response);
@@ -48,24 +48,26 @@ export default function Command() {
         });
       };
     }),
-    onError: (() => showToast({
-      style: Toast.Style.Error,
-      title: "Not Found",
-    }))
+    onError: (error: Error) => {
+      showToast({
+        style: Toast.Style.Failure,
+        title: "Not Found",
+      });
+    },
   });
 
   function memorizePreviousSearch() {
     searchMemory.push({ query: searchText, page: pageNumber });
   };
 
-  function showCitations(item) {
+  function showCitations(item: any) {
     return () => {
       memorizePreviousSearch();
       setSearchText(`refersto:recid:${item.id}`);
     };
   };
 
-  function showReferences(item) {
+  function showReferences(item: any) {
     return () => {
       memorizePreviousSearch();
       setSearchText(`citedby:recid:${item.id}`);
@@ -73,12 +75,16 @@ export default function Command() {
   };
 
   function goBack() {
-    const previousSearch = searchMemory.pop();
-    setStartingPage(previousSearch.page);
-    setSearchText(previousSearch.query);
-  };
+    const previousSearch: { query: string; page: number} | undefined = searchMemory.pop();
+    if (previousSearch) {
+      setStartingPage(previousSearch.page);
+      setSearchText(previousSearch.query);
+    }
+  }
+  
 
-  function listActions(item) {
+
+  function listActions(item: any) {
     return (
       <ActionPanel title="Inspire HEP Search">
         <Action.Push
@@ -176,7 +182,7 @@ export default function Command() {
       searchBarAccessory={
         <List.Dropdown
           tooltip="Sort by"
-          defaultValue={`${getPreferenceValues<sort>()}`}
+          defaultValue={`${getPreferenceValues().sort}`}
           onChange={(newValue) => setSortBy(newValue)}
         >
           <List.Dropdown.Item key={0} title={data && searchText ? `Most recent of ${data.hits.total} results` : "Most recent"} value="mostrecent" />
@@ -186,7 +192,7 @@ export default function Command() {
       }
       throttle
     >
-      {(searchText && data && data.hits && Array.isArray(data.hits.hits) ? data.hits.hits : []).map((item, index) => (
+      {(searchText && data && data.hits && Array.isArray(data.hits.hits) ? data.hits.hits : []).map((item: any, index: number) => (
         <ItemComponent key={item.id} item={item} index={index} page={pageNumber} itemActions={listActions(item)} />
       ))}
     </List>
