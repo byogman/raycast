@@ -24,7 +24,7 @@
       "description": "Choose default ordering of search results",
       "type": "dropdown",
       "data": [ {"title": "Most Recent", "value": "mostrecent"}, {"title": "Least Recent", "value": "leastrecent"}, {"title": "Most Cited", "value": "mostcited"} ],
-      "default": "0"
+      "default": "mostrecent"
     }
   ],
   "dependencies": {
