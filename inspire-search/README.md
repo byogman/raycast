@@ -4,11 +4,11 @@ Search papers on [inspirehep.net](https://inspirehep.net) and browse results fro
 
 The main view shows the total number of results, which can be sorted in order of most recent, least recent, or most cited. It also shows the number of citations and year of publication for each result. 
 
-![Main view](./assets/SearchView.png)
+![Main view](./metadata/inspire-search-1.png)
 
 The details view shows additional information such as abstract, book description, journal, publisher, number of pages, and keywords.
 
-![Details view](./assets/DetailsView.png)
+![Details view](./metadata/inspire-search-2.png)
 
 ## Actions
 
