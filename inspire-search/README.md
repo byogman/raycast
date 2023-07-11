@@ -2,7 +2,7 @@
 
 Search papers on inspirehep.net and browse results from Raycast. 
 
-![assets/SearchView.png]
+![Search view](./assets/SearchView.png)
 ## Actions
 
 Actions include:
