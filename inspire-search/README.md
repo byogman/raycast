@@ -1,15 +1,32 @@
-# Inspire-Search Extension for Raycast
+# Inspire Search Extension for Raycast
 
-Search papers on [inspirehep.net](https://inspirehep.net) and browse results from [Raycast](https://www.raycast.com). 
+Search papers on [inspirehep.net](https://inspirehep.net) and browse results from [Raycast](https://www.raycast.com). This extension is optimized for rapid bibliographic research.
 
-![Search view](./assets/SearchView.png)
+The main view shows the total number of results, which can be sorted in order of most recent, least recent, or most cited. It also shows the number of citations and year of publication for each result. 
+
+![Main view](./assets/SearchView.png)
+
+The details view shows additional information such as abstract, book description, journal, publisher, number of pages, and keywords.
 
 ![Details view](./assets/DetailsView.png)
+
 ## Actions
 
-Actions include:
+For each result one can perform the following actions :
 
-- **View Details:** show more details such as abstract, book description, journal, number of pages, and keywords.
-- **Open in Browser:** when available, download the preprint from [arxiv.org](https://arxiv.org) in pdf format. 
+- **View Details:** show details view (leave details view using 'esc' key).
+- **Open in Browser:** when available, download the preprint from [arxiv.org](https://arxiv.org) in pdf format. Otherwise, resolve the DOI or show the document page on [inspirehep.net](https://inspirehep.net).
+- **Show Citations:** show a list of documents that cite the result.
+- **Show References:** show a list of documents included in the result's bibliography.
+- **Copy BibTex to Clipboard:** copy the bibtex code to the clipboard.
+- **Add BibTex to Clipboard:** append the bibtex code to the clipboard content; helpful to copy the bibtex code for multiple results without leaving raycast.
 
-In the details view, hover on the authors to the see the complete list
+Results can be navigated using the following actions:
+
+- **Next Page:** shows the next 9 search results.
+- **Previous Page:** shows the previous 9 search results. 
+- **Go Back:** returns to the previous search after using "Show citations" or "Show References". 
+
+## Preferences
+
+In the extension preferences, it is possible to specify the default ordering of search results ("Most Recent", "Least Recent", or "Most Cited").
