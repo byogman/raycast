@@ -20,8 +20,13 @@ export default function Command() {
   const { isLoading, data } = useFetch(`${API_PATH}&sort=${sortBy}&page=${pageNumber}&q=${searchText}`, {
     execute: !!searchText,
     parseResponse: ((response) => response.json()),
-    // to make sure the screen isn't flickering when the searchText changes
     keepPreviousData: true,
+    onError: (error: Error) => {
+      showToast({
+        style: Toast.Style.Failure,
+        title: "Cannot load results",
+      });
+    },
   });
 
   useFetch(bibtexUrl, {
@@ -165,8 +170,6 @@ export default function Command() {
       </ActionPanel>
     )
   };
-
-  // resets page number after new search
 
   useEffect(() => {
     setPageNumber(startingPage);
