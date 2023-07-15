@@ -1,3 +1,3 @@
-# Inspire Changelog
+# Inspire Search Changelog
 
-## [Initial Version] - 2023-05-17
+## [Initial Version] - 2023-07-15
