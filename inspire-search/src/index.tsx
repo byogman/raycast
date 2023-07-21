@@ -1,5 +1,16 @@
 import { useState, useEffect } from "react";
-import { Action, ActionPanel, Clipboard, Detail, getPreferenceValues, Icon, List, showToast, Toast, useNavigation } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  Clipboard,
+  Detail,
+  getPreferenceValues,
+  Icon,
+  List,
+  showToast,
+  Toast,
+  useNavigation,
+} from "@raycast/api";
 import { useFetch } from "@raycast/utils";
 import { abbreviateNames, displayCollaborations, selectUrl } from "./utils";
 import ItemComponent from "./ItemComponent";
@@ -51,13 +62,7 @@ function ListView({ isLoading, searchText, setSearchText, data, pageNumber, acti
     >
       {(searchText && data && data.hits && Array.isArray(data.hits.hits) ? data.hits.hits : []).map(
         (item: any, index: number) => (
-          <ItemComponent
-            key={item.id}
-            item={item}
-            index={index}
-            page={pageNumber}
-            itemActions={actions(item, true)}
-          />
+          <ItemComponent key={item.id} item={item} index={index} page={pageNumber} itemActions={actions(item, true)} />
         )
       )}
     </List>
@@ -67,7 +72,7 @@ function ListView({ isLoading, searchText, setSearchText, data, pageNumber, acti
 type DetailComponentProps = {
   item: any;
   actions: (item: any, listView: boolean) => JSX.Element;
-}
+};
 
 function DetailView({ item, actions }: DetailComponentProps) {
   return (
@@ -76,8 +81,9 @@ function DetailView({ item, actions }: DetailComponentProps) {
       actions={actions(item, false)}
       markdown={
         item.metadata.document_type[0] === "book"
-          ? `**Book Description** \n --- \n ${item.metadata.abstracts ? item.metadata.abstracts[0].value : "Not available."
-          }`
+          ? `**Book Description** \n --- \n ${
+              item.metadata.abstracts ? item.metadata.abstracts[0].value : "Not available."
+            }`
           : `**Abstract** \n --- \n ${item.metadata.abstracts ? item.metadata.abstracts[0].value : "Not available."}`
       }
       metadata={
@@ -142,7 +148,7 @@ function DetailView({ item, actions }: DetailComponentProps) {
       }
     />
   );
-};
+}
 
 export default function Command() {
   const [searchText, setSearchText] = useState("");
@@ -238,12 +244,7 @@ export default function Command() {
           />
         )}
         {!listView && (
-          <Action
-            title="Return to List"
-            shortcut={{ modifiers: [], key: "enter" }}
-            icon={Icon.Undo}
-            onAction={pop}
-          />
+          <Action title="Return to List" shortcut={{ modifiers: [], key: "enter" }} icon={Icon.Undo} onAction={pop} />
         )}
         <Action.OpenInBrowser url={selectUrl(item)} shortcut={{ modifiers: ["cmd"], key: "enter" }} icon={Icon.Globe} />
         <Action
