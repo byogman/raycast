@@ -16,7 +16,7 @@ For each result one can perform the following actions :
 
 - **View Details:** (in list view only) show details view.
 - **Return to List:** (in details view only) return to list view.
-- **Open in Browser:** when available, download the preprint from [arxiv.org](https://arxiv.org) in pdf format. Otherwise, resolve the DOI or show the document page on [inspirehep.net](https://inspirehep.net).
+- **Open in Browser:** when available, download the preprint from [arxiv.org](https://arxiv.org) or KEK in pdf format. Otherwise, resolve the DOI or show the document page on [inspirehep.net](https://inspirehep.net).
 - **Copy BibTex to Clipboard:** copy the bibtex code to the clipboard.
 - **Add BibTex to Clipboard:** append the bibtex code to the clipboard content; helpful to copy the bibtex code for multiple results without leaving raycast.
 
